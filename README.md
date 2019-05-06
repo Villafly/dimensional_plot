@@ -1,4 +1,3 @@
 # dimensional_plot
-pickle for plot
-
+plot pickle
 python3
