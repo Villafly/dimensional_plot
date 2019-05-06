@@ -1,0 +1,29 @@
+import networkx as nx
+import numpy as np
+#from networkx.generators.community import stochastic_block_model
+#for node in range(100,1100,300):
+#    for density in range(5,26,5):
+block_num = 16
+for node in range(400,2300,300):
+    for cnt,density in enumerate(range(5,21,5)):
+        density *= 0.0005
+        edge_num = density *(node*(node-1)/2) +1
+        BA = nx.random_graphs.barabasi_albert_graph(node, cnt+1, seed=None)
+        ER = nx.random_graphs.erdos_renyi_graph(node,density)
+        #print (node,edge_num)
+        block_edges = int(float(edge_num)/block_num)
+        node_per_block = int(float(node)/block_num)
+        block_edges = 2*block_edges/ float(node_per_block)
+        in_edges = int(block_edges *4/5)            
+        out_edges = block_edges - in_edges
+        #print (block_edges  , in_edges, out_edges)         
+        p_in = in_edges/float(node_per_block)
+        p_out = out_edges/float(node - node_per_block)
+        #print (p_in,p_out)
+        probs = [ p_out if i!=j else p_in for i in range(block_num) for j in range(block_num)]
+        probs = np.array(probs).reshape(block_num,-1)
+        sizes = [int(node/float(block_num)) for i in range(block_num)]
+        SBM = nx.stochastic_block_model(sizes, probs, seed=0)
+        nx.write_edgelist(SBM,'./SBM_node_{}_density_{}'.format(node,density),data=False)
+        nx.write_edgelist(BA,'./BA_node_{}_density_{}'.format(node,density),data=False)
+        nx.write_edgelist(ER,'./ER_node_{}_density_{}'.format(node,density),data=False)
